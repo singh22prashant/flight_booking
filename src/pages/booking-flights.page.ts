@@ -6,6 +6,7 @@ export class BookingFlightsPage {
   readonly destination: Locator;
   readonly travelDates: Locator;
   readonly searchButton: Locator;
+  readonly oneWayInput: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -13,10 +14,13 @@ export class BookingFlightsPage {
     this.destination = page.locator('[data-ui-name="input_location_to_segment_0"]');
     this.travelDates = page.locator('[data-ui-name="button_date_segment_0"]');
     this.searchButton = page.locator('[data-ui-name="button_search_submit"]');
+    this.oneWayInput = page.locator('[data-ui-name="input_search_type_oneway"]');
   }
 
   async open(): Promise<void> {
     await this.page.goto('/flights/index.en-gb.html', { waitUntil: 'domcontentloaded' });
+    await this.page.waitForLoadState('load');
+    await this.oneWayInput.waitFor({ state: 'attached' });
   }
 
   async selectDestination(code: string): Promise<void> {
@@ -67,10 +71,9 @@ export class BookingFlightsPage {
   }
 
   async selectOneWay(): Promise<void> {
-    // Booking renders the radio input without an accessible radio role in CI.
-    await this.page
-      .locator('[data-ui-name="input_search_type_oneway"]')
-      .check();
+    // Wait for Booking's hydrated radio control before changing the trip type.
+    await this.oneWayInput.waitFor({ state: 'visible' });
+    await this.oneWayInput.check();
   }
 
   async selectDepartureDate(daysFromToday: number): Promise<Date> {
