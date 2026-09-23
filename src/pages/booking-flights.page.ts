@@ -47,7 +47,15 @@ export class BookingFlightsPage {
   }
 
   async selectOneWay(): Promise<void> {
-    await this.page.getByRole('radio', { name: 'One way' }).check();
+    const oneWayRadio = this.page.getByRole('radio', { name: 'One way' });
+
+    if (await oneWayRadio.count()) {
+      await oneWayRadio.check();
+      return;
+    }
+
+    // Booking exposes the control as visible text in some CI/browser variants.
+    await this.page.getByText('One way', { exact: true }).click();
   }
 
   async selectDepartureDate(daysFromToday: number): Promise<Date> {
