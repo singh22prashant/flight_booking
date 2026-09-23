@@ -20,8 +20,28 @@ export class BookingFlightsPage {
   }
 
   async selectDestination(code: string): Promise<void> {
-    await this.destination.click();
-    const input = this.page.getByRole('combobox', { name: 'Arrival airport or city' });
+    await this.selectLocation(
+      this.destination,
+      'Arrival airport or city',
+      code,
+    );
+  }
+
+  async selectOrigin(code: string): Promise<void> {
+    await this.selectLocation(
+      this.origin,
+      'Departure airport or city',
+      code,
+    );
+  }
+
+  private async selectLocation(
+    field: Locator,
+    inputName: string,
+    code: string,
+  ): Promise<void> {
+    await field.click();
+    const input = this.page.getByRole('combobox', { name: inputName });
     const serviceError = this.page.getByText(/Oops, something's not right/i);
     await input.waitFor({ state: 'visible' });
     await input.fill(code);
@@ -39,7 +59,7 @@ export class BookingFlightsPage {
 
     if (await serviceError.isVisible()) {
       throw new Error(
-        `Booking.com did not return airport suggestions for destination ${code}.`,
+        `Booking.com did not return airport suggestions for ${inputName.toLowerCase()} ${code}.`,
       );
     }
 
@@ -47,15 +67,10 @@ export class BookingFlightsPage {
   }
 
   async selectOneWay(): Promise<void> {
-    const oneWayRadio = this.page.getByRole('radio', { name: 'One way' });
-
-    if (await oneWayRadio.count()) {
-      await oneWayRadio.check();
-      return;
-    }
-
-    // Booking exposes the control as visible text in some CI/browser variants.
-    await this.page.getByText('One way', { exact: true }).click();
+    // Booking renders the radio input without an accessible radio role in CI.
+    await this.page
+      .locator('[data-ui-name="input_search_type_oneway"]')
+      .check();
   }
 
   async selectDepartureDate(daysFromToday: number): Promise<Date> {

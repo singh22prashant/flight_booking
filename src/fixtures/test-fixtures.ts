@@ -23,20 +23,30 @@ export const test = base.extend<Fixtures>({
       const requestUrl = new URL(route.request().url());
       const query = requestUrl.searchParams.get('q')?.toUpperCase();
 
-      if (query !== 'BOM') {
+      if (query !== 'BOM' && query !== 'DEL') {
         await route.continue();
         return;
       }
 
-      // Return only the destination used by this suite; unrelated queries stay live.
+      // Return only the airports used by this suite; unrelated queries stay live.
+      const airport = query === 'DEL'
+        ? {
+            code: 'DEL',
+            name: 'Delhi International Airport',
+            city: 'New Delhi',
+          }
+        : {
+            code: 'BOM',
+            name: 'Mumbai',
+            city: 'Mumbai',
+          };
+
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify([
           {
-            code: 'BOM',
-            name: 'Mumbai',
-            city: 'Mumbai',
+            ...airport,
             country: 'India',
             type: 'AIRPORT',
           },

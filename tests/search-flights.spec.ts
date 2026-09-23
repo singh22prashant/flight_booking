@@ -34,6 +34,7 @@ test('searches DEL to BOM one way for today', async ({
 }) => {
   await bookingFlightsPage.open();
   await bookingFlightsPage.selectOneWay();
+  await bookingFlightsPage.selectOrigin(flightRoute.originCode);
   await bookingFlightsPage.selectDestination(flightRoute.destinationCode);
   // The page object derives the date from the calendar's highlighted today.
   const departureDate = await bookingFlightsPage.selectDepartureDate(0);
@@ -55,6 +56,7 @@ test('searches DEL to BOM one way for tomorrow', async ({
 }) => {
   await bookingFlightsPage.open();
   await bookingFlightsPage.selectOneWay();
+  await bookingFlightsPage.selectOrigin(flightRoute.originCode);
   await bookingFlightsPage.selectDestination(flightRoute.destinationCode);
   // Offset one day from the calendar-derived today date to avoid runner timezone drift.
   const departureDate = await bookingFlightsPage.selectDepartureDate(1);
@@ -76,6 +78,7 @@ test('sorts DEL to BOM one-way results by cheapest price', async ({
 }) => {
   await bookingFlightsPage.open();
   await bookingFlightsPage.selectOneWay();
+  await bookingFlightsPage.selectOrigin(flightRoute.originCode);
   await bookingFlightsPage.selectDestination(flightRoute.destinationCode);
   const departureDate = await bookingFlightsPage.selectDepartureDate(0);
   await bookingFlightsPage.search();
